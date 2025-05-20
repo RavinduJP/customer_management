@@ -1,7 +1,9 @@
 package com.example.customer_management.entity;
 
+import com.example.customer_management.utils.StringListConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,8 +31,9 @@ public class Customer {
     @Column(name = "nic_number", unique = true, nullable = false)
     private String nicNumber;
 
+    @Convert(converter = StringListConverter.class)
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PhoneNumber> phoneNumbers = new ArrayList<>();
+    private List<String> phoneNumbers = new ArrayList<>();
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
