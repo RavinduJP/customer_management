@@ -1,5 +1,6 @@
 package com.example.customer_management.dto;
 
+import com.example.customer_management.entity.City;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -17,9 +18,8 @@ public class AddressDTO {
 
     private String addressLine2;
 
+    //    private City cityId;
     @NotNull(message = "City is mandatory")
-    private Long cityId;
-
     private String cityName;
     private String countryName;
 }

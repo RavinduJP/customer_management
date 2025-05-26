@@ -15,15 +15,12 @@ public class CustomerRelation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String relation;
+
+    @Column(name = "relation_type", nullable = false)
+    private String relationType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "relation_id", nullable = false)
-    private Customer relation;
-
-    @Column(name = "relation_type", nullable = false)
-    private String relationType;
 }

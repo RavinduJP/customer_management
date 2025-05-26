@@ -31,14 +31,14 @@ public class Customer {
     @Column(name = "nic_number", unique = true, nullable = false)
     private String nicNumber;
 
-    @Convert(converter = StringListConverter.class)
+//    @Convert(converter = StringListConverter.class)
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<String> phoneNumbers = new ArrayList<>();
+    private List<PhoneNumber> phoneNumbers = new ArrayList<>();
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CustomerRelation> relations = new ArrayList<>();
+    private List<CustomerRelation> familyMembers = new ArrayList<>();
 
 }

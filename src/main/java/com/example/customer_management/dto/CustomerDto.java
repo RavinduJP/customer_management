@@ -1,5 +1,7 @@
 package com.example.customer_management.dto;
 
+import com.example.customer_management.entity.Address;
+import com.example.customer_management.entity.CustomerRelation;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +28,6 @@ public class CustomerDto {
     private String nicNumber;
 
     private List<String> phoneNumbers;
-    private List<AddressDTO> addresses;
-    private List<FamilyMemberDTO> familyMembers;
+    private List<Address> addresses;
+    private List<CustomerRelation> familyMembers;
 }

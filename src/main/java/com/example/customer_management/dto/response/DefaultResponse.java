@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
+
 @Getter
 @Setter
 @Builder
@@ -25,6 +27,13 @@ public class DefaultResponse {
         this.data = data;
     }
 
+    public DefaultResponse(String code, String status, String message) {
+        this.code = code;
+        this.status = status;
+        this.message = message;
+        this.data = new HashMap<>();
+    }
+
     public static DefaultResponse success(String status, String message, Object data) {
         return new DefaultResponse(ResponseCodeUtils.SUCCESS_CODE, ResponseUtils.SUCCESS, message, data);
     }
@@ -35,5 +44,9 @@ public class DefaultResponse {
 
     public static DefaultResponse internalServerError(String status, String message, Object data) {
         return new DefaultResponse(ResponseCodeUtils.INTERNAL_SERVER_ERROR_CODE, ResponseUtils.INTERNAL_SERVER_ERROR, message, data);
+    }
+
+    public static DefaultResponse internalServerError(String status, String message) {
+        return new DefaultResponse(ResponseCodeUtils.INTERNAL_SERVER_ERROR_CODE, ResponseUtils.INTERNAL_SERVER_ERROR, message, new HashMap<String, Object>());
     }
 }

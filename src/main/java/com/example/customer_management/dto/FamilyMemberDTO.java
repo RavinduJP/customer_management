@@ -11,11 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FamilyMemberDTO {
 
-    private Long id;
-
-    @NotNull(message = "Customer ID is mandatory")
-    private Long customerId;
-
     private String customerName;
 
     @NotBlank(message = "Relation type is mandatory")
