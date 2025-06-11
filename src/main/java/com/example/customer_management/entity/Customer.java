@@ -33,12 +33,12 @@ public class Customer {
 
 //    @Convert(converter = StringListConverter.class)
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PhoneNumber> phoneNumbers = new ArrayList<>();
+    private List<PhoneNumber> phoneNumbers;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Address> addresses = new ArrayList<>();
+    private List<Address> addresses;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CustomerRelation> familyMembers = new ArrayList<>();
+    private List<CustomerRelation> familyMembers;
 
 }

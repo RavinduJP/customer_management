@@ -31,7 +31,7 @@ public class CustomerController {
         return "Hello World!";
     }
 
-    @PostMapping("/create_customer")
+    @PostMapping("/create-customer")
     public ResponseEntity<DefaultResponse> createCustomers(@Valid @RequestBody CreateCustomerRequest createCustomerRequest) {
         log.info("Customer creation attempted for NIC: {}", createCustomerRequest.getNicNumber());
         try {

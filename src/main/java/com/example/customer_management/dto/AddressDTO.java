@@ -18,7 +18,7 @@ public class AddressDTO {
 
     private String addressLine2;
 
-    //    private City cityId;
+    private City cityId;
     @NotNull(message = "City is mandatory")
     private String cityName;
     private String countryName;

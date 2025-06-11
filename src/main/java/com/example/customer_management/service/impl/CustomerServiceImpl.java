@@ -3,11 +3,10 @@ package com.example.customer_management.service.impl;
 import com.example.customer_management.dto.CustomerDto;
 import com.example.customer_management.dto.request.CreateCustomerRequest;
 import com.example.customer_management.dto.response.BaseResponse;
-import com.example.customer_management.entity.Address;
-import com.example.customer_management.entity.Customer;
-import com.example.customer_management.entity.CustomerRelation;
-import com.example.customer_management.entity.PhoneNumber;
-import com.example.customer_management.repository.CustomerRepository;
+import com.example.customer_management.entity.*;
+import com.example.customer_management.repository.*;
+import com.example.customer_management.service.CityService;
+import com.example.customer_management.service.CountryService;
 import com.example.customer_management.service.CustomerService;
 import com.example.customer_management.utils.ResponseCodeUtils;
 import com.example.customer_management.utils.ResponseUtils;
@@ -25,6 +24,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
+    private final CityRepository cityRepository;
+    private final CityService cityService;
+    private final AddressRepository addressRepository;
+    private final CountryRepository countryRepository;
+    private final CountryService countryService;
+    private final PhoneNumberRepository phoneNumberRepository;
+    private final RelationRepository relationRepository;
 
     @Override
     public BaseResponse<HashMap<String, Object>> createCustomer(CreateCustomerRequest createCustomerRequest) {
@@ -43,8 +49,31 @@ public class CustomerServiceImpl implements CustomerService {
                     .name(createCustomerRequest.getName())
                     .dateOfBirth(createCustomerRequest.getDateOfBirth())
                     .nicNumber(createCustomerRequest.getNicNumber())
-                    .addresses(createCustomerRequest.getAddresses())
                     .build();
+            Customer savedCustomer = customerRepository.save(newCustomer);
+
+            List<Address> addresses = createCustomerRequest.getAddresses().stream()
+                    .map(addressDto -> {
+                        Address address = new Address();
+                        address.setAddressLine1(addressDto.getAddressLine1());
+                        address.setAddressLine2(addressDto.getAddressLine2());
+
+                        log.info("Address: {}, City: {}, Country: {}", address.getAddressLine1(), address.getCity(), address.getCountry());
+
+                        City city = cityService.findOrCreateCity(addressDto.getCity().getName(), addressDto.getCountry().getName());
+                        if (city == null || city.getId() == null) {
+                            throw new RuntimeException("City could not be created or found");
+                        }
+                        address.setCity(city);
+
+                        Country country = countryService.findOrCreateCountry(addressDto.getCountry().getName());
+                        address.setCountry(country);
+
+                        address.setCustomer(savedCustomer);
+                        return address;
+                    })
+                    .collect(Collectors.toList());
+            addressRepository.saveAll(addresses);
 
             List<PhoneNumber> phoneNumberList = createCustomerRequest.getPhoneNumbers().stream()
                     .map(number -> {
@@ -54,31 +83,23 @@ public class CustomerServiceImpl implements CustomerService {
                         return phoneNumber;
                     })
                     .collect(Collectors.toList());
-            newCustomer.setPhoneNumbers(phoneNumberList);
+            phoneNumberRepository.saveAll(phoneNumberList);
+            savedCustomer.setPhoneNumbers(phoneNumberList);
 
-            List<Address> addresses = createCustomerRequest.getAddresses().stream()
-                    .map(addressDto -> {
-                        Address address = new Address();
-                        address.setAddressLine1(addressDto.getAddressLine1());
-                        address.setAddressLine2(addressDto.getAddressLine2());
-                        address.setCity(addressDto.getCity());
-                        address.setCustomer(newCustomer);
-                        return address;
-                    })
-                    .collect(Collectors.toList());
-            newCustomer.setAddresses(addresses);
-
+//get the customer relationship
             List<CustomerRelation> relations = createCustomerRequest.getFamilyMembers().stream()
                     .map(familyMemberDTO -> {
-                        CustomerRelation customerRelation = new CustomerRelation();
-                        customerRelation.setRelation(familyMemberDTO.getCustomerName());
-                        customerRelation.setRelationType(familyMemberDTO.getRelationType());
-                        customerRelation.setCustomer(newCustomer);
-                        return customerRelation;
+                        Customer customerRelation = customerRepository.findByNicNumber(createCustomerRequest.getNicNumber())
+                                .orElseThrow(() -> new RuntimeException("Related customer not found with NIC: " + createCustomerRequest.getNicNumber()));
+                        return CustomerRelation.builder()
+                                .customer(customerRelation)
+                                .relation(familyMemberDTO.getCustomerName())
+                                .relationType(familyMemberDTO.getRelationType())
+                                .build();
                     }).collect(Collectors.toList());
-            newCustomer.setFamilyMembers(relations);
+            relationRepository.saveAll(relations);
+            savedCustomer.setFamilyMembers(relations);
 
-            Customer savedCustomer = customerRepository.save(newCustomer);
 
             HashMap<String, Object> newCustomerObj = new HashMap<>();
             newCustomerObj.put("name", savedCustomer.getName());
